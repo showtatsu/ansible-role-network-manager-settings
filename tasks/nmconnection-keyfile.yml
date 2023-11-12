@@ -1,0 +1,34 @@
+---
+# tasks file for ansible-role-network-manager
+- name: read nmconnection setting keyfiles
+  ansible.builtin.slurp:
+    src: "/etc/NetworkManager/system-connections/{{ item['device'] }}.nmconnection"
+  with_list: "{{ network_interfaces }}"
+  loop_control:
+    label: "{{ item['device'] }}"
+  register: nmconnection_files
+
+- name: parse nmconnection setting keyfiles
+  ansible.builtin.set_fact:
+    nmconnection_info: >-
+      {{ (nmconnection_info | default({})) |
+          combine({
+            item['item']['device']: (item['content'] | b64decode | nm_parse_nmconnection_keyfile)
+          })
+      }}
+  with_list: "{{ nmconnection_files['results'] }}"
+  loop_control:
+    label: "{{ item['item']['device'] }}.nmconnection"
+
+- name: write nmconnection setting keyfiles
+  template:
+    src: "system-connections/nmconnection.j2"
+    dest: "/etc/NetworkManager/system-connections/{{ item['device'] }}.nmconnection"
+    owner: root
+    group: root
+    mode: 0600
+  with_list: "{{ network_interfaces }}"
+  loop_control:
+    label: "{{ item['device'] }}.nmconnection"
+  when: item['device'] in nmconnection_info.keys()
+  notify: restart network manager service

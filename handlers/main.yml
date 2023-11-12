@@ -1,0 +1,7 @@
+---
+# handlers file for ansible-role-network-manager
+- name: restart network manager service
+  ansible.builtin.service:
+    name: NetworkManager
+    state: restarted
+  when: network_manager_restart_on_modify

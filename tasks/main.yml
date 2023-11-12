@@ -1,0 +1,3 @@
+- name: NetworkManager settings (keyfile)
+  include_tasks: "nmconnection-keyfile.yml"
+  when: network_manager_setting_mode == "keyfile"

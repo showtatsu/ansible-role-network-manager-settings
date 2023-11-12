@@ -1,0 +1,40 @@
+{%- set nm_info = nmconnection_info[item.device] -%}
+
+[connection]
+{% for key in nm_info['connection']['_keys'] %}
+{{ key }}={{ nm_info['connection'][key] }}
+{% endfor %}
+
+[ethernet]
+{% for key in nm_info['ethernet']['_keys'] %}
+{{ key }}={{ nm_info['ethernet'][key] }}
+{% endfor %}
+
+[ipv4]
+{% set nm_info_section = nm_info['ipv4'] %}
+{% set netspec = item.netspec %}
+{% if netspec %}
+{%   set netspec_routes = netspec.ipv4_routing_table | default([]) %}
+{%   set netspec_dns_servers = netspec.ipv4_dns_servers | default([]) %}
+{% else %}
+{%   set netspec_routes = [] %}
+{%   set netspec_dns_servers = [] %}
+{% endif %}
+{% include 'nmconnection.ip-section.j2' %}
+
+[ipv6]
+{% set nm_info_section = nm_info['ipv6'] %}
+{% set netspec = item.netspec %}
+{% if netspec %}
+{%   set netspec_routes = netspec.ipv6_routing_table | default([]) %}
+{%   set netspec_dns_servers = netspec.ipv6_dns_servers | default([]) %}
+{% else %}
+{%   set netspec_routes = [] %}
+{%   set netspec_dns_servers = [] %}
+{% endif %}
+{% include 'nmconnection.ip-section.j2' %}
+
+[proxy]
+{% for key in nm_info['proxy']['_keys'] %}
+{{ key }}={{ nm_info['proxy'][key] }}
+{% endfor %}

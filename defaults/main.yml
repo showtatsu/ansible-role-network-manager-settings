@@ -1,0 +1,4 @@
+---
+# defaults file for ansible-role-network-manager
+network_manager_setting_mode: "keyfile"
+network_manager_restart_on_modify: true

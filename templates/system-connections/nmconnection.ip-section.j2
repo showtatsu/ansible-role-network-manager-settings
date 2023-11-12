@@ -1,0 +1,26 @@
+{% for key in nm_info_section['_keys'] %}
+{%   if key | regex_search('^address[0-9]+$') %}
+{{ key }}={{ nm_info_section[key] | regex_replace(',.+$', '') }}
+{%   elif key | regex_search('^route[0-9]+$') %}
+{%     if not netspec %}
+{{ key }}={{ nm_info_section[key] }}
+{%     endif %}
+{%   elif key | regex_search('^(dns|dns-search)$') %}
+{%     if not netspec %}
+{{ key }}={{ nm_info_section[dns] }}
+{%     endif %}
+{%   else %}
+{{ key }}={{ nm_info_section[key] }}
+{%   endif %}
+{% endfor %}
+{% if netspec %}
+{%-   if netspec_dns_servers %}
+dns={% for s in netspec_dns_servers %}{{ s }};{% endfor %}{{ "\n" }}
+{%-     if netspec.dns_search %}
+dns-search={% for s in netspec.dns_search %}{{ s }};{% endfor %}{{ "\n" }}
+{%-     endif %}
+{%-   endif %}
+{%   for route in netspec_routes %}
+route{{ loop.index }}={{ route.to }},{{ route.via }}
+{%   endfor %}
+{% endif %}
