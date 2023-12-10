@@ -3,7 +3,7 @@
 - name: read nmconnection setting keyfiles
   ansible.builtin.slurp:
     src: "/etc/NetworkManager/system-connections/{{ item['device'] }}.nmconnection"
-  with_list: "{{ network_interfaces }}"
+  with_list: "{{ netspec_interfaces }}"
   loop_control:
     label: "{{ item['device'] }}"
   register: nmconnection_files
@@ -27,7 +27,7 @@
     owner: root
     group: root
     mode: 0600
-  with_list: "{{ network_interfaces }}"
+  with_list: "{{ netspec_interfaces }}"
   loop_control:
     label: "{{ item['device'] }}.nmconnection"
   when: item['device'] in nmconnection_info.keys()
